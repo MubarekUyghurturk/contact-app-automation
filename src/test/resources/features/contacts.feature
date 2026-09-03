@@ -24,6 +24,18 @@ Feature: Contact list management
       | John123   | Doe       |
       | Jane      | Doe!      |
 
+  Scenario Outline: Accept names written in non-English languages
+    When I add a contact with first name "<firstName>" and last name "<lastName>"
+    Then the contact "<firstName> <lastName>" should appear in the contact list
+    And no error message should be displayed
+
+    Examples:
+      | firstName | lastName    | language      |
+      | مبارك     | ئويغۇرتۈرك  | Uyghur/Arabic |
+      | 李         | 伟          | Chinese       |
+      | Иван      | Петров      | Cyrillic      |
+      | José      | Muñoz       | Accented Latin |
+
   Scenario: Remove an existing contact
     Given a contact "Grace Hopper" already exists
     When I remove the contact "Grace Hopper"

@@ -63,4 +63,9 @@ public class ContactStepDefinitions {
     public void an_error_message_should_be_displayed() {
         Assert.assertTrue("Expected an error message to be displayed", contactsPage.isErrorDisplayed());
     }
+
+    @Then("no error message should be displayed")
+    public void no_error_message_should_be_displayed() {
+        Assert.assertFalse("Expected no error message to be displayed", contactsPage.isErrorDisplayed());
+    }
 }
