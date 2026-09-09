@@ -78,6 +78,31 @@ public class ContactsPage {
         return getContactNames().stream().anyMatch(text -> text.contains(fullName));
     }
 
+    /**
+     * Adding/removing a contact is async (fetch + re-render), so a check made
+     * immediately after clicking Add/Remove can race the app. Poll instead of
+     * asserting on a single snapshot.
+     */
+    public boolean waitUntilContactDisplayed(String fullName, Duration timeout) {
+        try {
+            return new WebDriverWait(driver, timeout)
+                    .ignoring(StaleElementReferenceException.class)
+                    .until(d -> isContactDisplayed(fullName));
+        } catch (org.openqa.selenium.TimeoutException e) {
+            return false;
+        }
+    }
+
+    public boolean waitUntilContactNotDisplayed(String fullName, Duration timeout) {
+        try {
+            return new WebDriverWait(driver, timeout)
+                    .ignoring(StaleElementReferenceException.class)
+                    .until(d -> !isContactDisplayed(fullName));
+        } catch (org.openqa.selenium.TimeoutException e) {
+            return false;
+        }
+    }
+
     public boolean isErrorDisplayed() {
         List<WebElement> errors = driver.findElements(errorMessage);
         return !errors.isEmpty() && errors.get(0).isDisplayed();

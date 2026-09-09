@@ -8,7 +8,11 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.junit.Assert;
 
+import java.time.Duration;
+
 public class ContactStepDefinitions {
+
+    private static final Duration ASSERTION_TIMEOUT = Duration.ofSeconds(5);
 
     private final ContactsPage contactsPage = new ContactsPage(DriverFactory.getDriver());
     private int contactCountBeforeAction;
@@ -24,7 +28,10 @@ public class ContactStepDefinitions {
         if (!contactsPage.isContactDisplayed(fullName)) {
             contactsPage.addContact(parts[0], parts[1]);
         }
-        Assert.assertTrue("Precondition failed: contact was not created", contactsPage.isContactDisplayed(fullName));
+        Assert.assertTrue(
+                "Precondition failed: contact was not created",
+                contactsPage.waitUntilContactDisplayed(fullName, ASSERTION_TIMEOUT)
+        );
     }
 
     @When("I add a contact with first name {string} and last name {string}")
@@ -42,15 +49,15 @@ public class ContactStepDefinitions {
     public void the_contact_should_appear_in_the_contact_list(String fullName) {
         Assert.assertTrue(
                 "Expected contact '" + fullName + "' to appear in the list",
-                contactsPage.isContactDisplayed(fullName)
+                contactsPage.waitUntilContactDisplayed(fullName, ASSERTION_TIMEOUT)
         );
     }
 
     @Then("the contact {string} should not appear in the contact list")
     public void the_contact_should_not_appear_in_the_contact_list(String fullName) {
-        Assert.assertFalse(
+        Assert.assertTrue(
                 "Expected contact '" + fullName + "' to be removed from the list",
-                contactsPage.isContactDisplayed(fullName)
+                contactsPage.waitUntilContactNotDisplayed(fullName, ASSERTION_TIMEOUT)
         );
     }
 
