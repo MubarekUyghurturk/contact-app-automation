@@ -21,6 +21,10 @@
         <webdrivermanager.version>5.8.0</webdrivermanager.version>
         <cucumber.version>7.15.0</cucumber.version>
         <junit.version>4.13.2</junit.version>
+        <cucumber-reporting.version>5.7.7</cucumber-reporting.version>
+
+        <!-- Overridable via -Dreport.buildNumber=$BUILD_NUMBER from CI -->
+        <report.buildNumber>local</report.buildNumber>
     </properties>
 
     <dependencies>
@@ -78,6 +82,34 @@
                         <include>**/*Runner.java</include>
                     </includes>
                     <testFailureIgnore>false</testFailureIgnore>
+                </configuration>
+            </plugin>
+            <!--
+              Turns the Cucumber JSON output into a polished, standalone HTML report
+              (trends, feature/scenario breakdown, embedded failure screenshots).
+              Not bound to a lifecycle phase on purpose: `mvn test` fails fast on
+              scenario failures (as it should, for CI gating), which would stop a
+              phase-bound plugin from ever running on a failed build — exactly when
+              a report is most wanted. Run it as a separate, explicit step instead:
+
+                mvn test                                                # may exit non-zero
+                mvn net.masterthought:maven-cucumber-reporting:generate  # always runs
+
+              Report lands in target/cucumber-html-reports/overview-features.html
+            -->
+            <plugin>
+                <groupId>net.masterthought</groupId>
+                <artifactId>maven-cucumber-reporting</artifactId>
+                <version>${cucumber-reporting.version}</version>
+                <configuration>
+                    <projectName>contact-app-automation</projectName>
+                    <outputDirectory>${project.build.directory}</outputDirectory>
+                    <inputDirectory>${project.build.directory}/cucumber-reports</inputDirectory>
+                    <jsonFiles>
+                        <jsonFile>*.json</jsonFile>
+                    </jsonFiles>
+                    <buildNumber>${report.buildNumber}</buildNumber>
+                    <checkBuildResult>false</checkBuildResult>
                 </configuration>
             </plugin>
         </plugins>
