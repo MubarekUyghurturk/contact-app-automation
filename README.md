@@ -47,6 +47,27 @@ mvn test -DbaseUrl=http://localhost:3000 -Dheadless=true
 
 ## Reports & screenshots
 
-- HTML report: `target/cucumber-reports/report.html`
+- Plain Cucumber HTML report: `target/cucumber-reports/report.html`
 - JSON report: `target/cucumber-reports/report.json`
 - Failure screenshots: `target/screenshots/`
+
+### Rich HTML report
+
+For a polished, standalone HTML report (pass/fail charts, per-feature and
+per-step breakdown, embedded failure screenshots), generate it from the
+JSON output as a separate step after the tests run:
+
+```bash
+mvn test
+mvn net.masterthought:maven-cucumber-reporting:generate
+```
+
+It's a separate command on purpose: `mvn test` fails fast on scenario
+failures (so CI can gate on its exit code), which would stop a
+phase-bound plugin from ever running — exactly when a report is most
+useful. Running it as its own step means it's generated regardless of
+whether the tests passed.
+
+Open `target/cucumber-html-reports/overview-features.html`. Pass
+`-Dreport.buildNumber=<id>` (e.g. `$BUILD_NUMBER` in CI) to label the
+report with a build identifier.
